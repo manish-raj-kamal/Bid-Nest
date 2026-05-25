@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ===== Design Tokens ===== */
+@theme {
+  --color-bg-primary: #f6f3ec;
+  --color-bg-secondary: #fffdf8;
+  --color-bg-white: #FFFFFF;
+  --color-accent: #1f8f63;
+  --color-accent-dark: #156949;
+  --color-accent-light: #e5f6ed;
+  --color-ink: #10213a;
+  --color-gold: #c79a4a;
+  --color-text-primary: #14213d;
+  --color-text-secondary: #667085;
+  --color-border: #e7dfd2;
+  --color-border-light: #f4efe5;
+
+  --font-sans: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
+  --font-brush: 'Caveat', cursive;
+
+  --shadow-soft: 0 12px 30px rgba(20, 33, 61, 0.05), 0 2px 8px rgba(20, 33, 61, 0.04);
+  --shadow-soft-md: 0 18px 50px rgba(20, 33, 61, 0.08), 0 6px 18px rgba(20, 33, 61, 0.05);
+  --shadow-soft-lg: 0 28px 70px rgba(20, 33, 61, 0.11), 0 12px 24px rgba(20, 33, 61, 0.06);
+  --shadow-soft-xl: 0 40px 90px rgba(20, 33, 61, 0.14), 0 16px 36px rgba(20, 33, 61, 0.08);
+}
+
+/* ===== Base Styles ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at top left, rgba(199, 154, 74, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(31, 143, 99, 0.12), transparent 30%),
+    linear-gradient(180deg, #fffdf8 0%, #f7f2e9 44%, #f6f3ec 100%);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* ===== Glassmorphism Utility ===== */
+.glass {
+  background: rgba(255, 251, 245, 0.76);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.glass-strong {
+  background: rgba(255, 252, 248, 0.9);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+/* ===== Ambient Glow ===== */
+.ambient-glow {
+  position: relative;
+}
+.ambient-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(31, 143, 99, 0.07) 50%,
+    rgba(31, 143, 99, 0.13) 70%,
+    rgba(31, 143, 99, 0.2) 90%
+  );
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 0 0 2rem 0;
+}
+
+.mesh-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.mesh-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(199, 154, 74, 0.14), transparent 28%),
+    linear-gradient(220deg, rgba(31, 143, 99, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent 100%);
+  pointer-events: none;
+}
+
+/* ===== Selection ===== */
+::selection {
+  background-color: rgba(47, 143, 91, 0.15);
+  color: var(--color-text-primary);
+}
+
+/* ===== Form inputs ===== */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+}
