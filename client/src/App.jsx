@@ -66,6 +66,14 @@ const AppLayout = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/profile/:id" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}
