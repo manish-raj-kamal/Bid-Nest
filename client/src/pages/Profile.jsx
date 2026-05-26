@@ -36,14 +36,26 @@ const Profile = () => {
   const [upgradeLoading, setUpgradeLoading] = useState(false);
 
   useEffect(() => {
-    if (user?.role === 'bidder') {
+    if (isViewingOther && user?.role === 'admin') {
+      setViewLoading(true);
+      apiRequest(`/api/users/${id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+        .then((data) => setViewedUser(data))
+        .catch(() => setViewedUser(null))
+        .finally(() => setViewLoading(false));
+    }
+  }, [id, user]);
+
+  useEffect(() => {
+    if (!isViewingOther && user?.role === 'bidder') {
       apiRequest('/api/upgrade-requests/me', {
         headers: { Authorization: `Bearer ${user.token}` },
       })
         .then((data) => setExistingRequest(data))
         .catch(() => {});
     }
-  }, [user]);
+  }, [user, isViewingOther]);
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
