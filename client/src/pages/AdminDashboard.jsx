@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Users, Gavel, ShieldCheck, AlertCircle, CheckCircle, XCircle, ArrowUpCircle, ChevronDown } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useAuth } from '../context/auth';
@@ -206,7 +207,7 @@ const AdminDashboard = () => {
                           <div className="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {u.name?.charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-sm font-medium text-text-primary">{u.name}</span>
+                          <Link to={`/profile/${u._id}`} className="text-sm font-medium text-text-primary hover:text-accent transition-colors">{u.name}</Link>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-text-secondary">{u.email}</td>
@@ -258,7 +259,7 @@ const AdminDashboard = () => {
                           {r.user?.name?.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-text-primary">{r.user?.name}</p>
+                          <Link to={`/profile/${r.user?._id}`} className="text-sm font-semibold text-text-primary hover:text-accent transition-colors">{r.user?.name}</Link>
                           <p className="text-xs text-text-secondary">{r.user?.email}</p>
                         </div>
                         <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${
