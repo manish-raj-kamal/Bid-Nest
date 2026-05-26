@@ -12,6 +12,7 @@ import {
   updateProfile,
   changePassword,
   getAllUsers,
+  getUserById,
   updateUserRole,
 } from '../controllers/userController.js';
 import protect, { restrictTo } from '../middleware/auth.js';
@@ -30,6 +31,7 @@ router.put('/me', protect, updateProfile);
 router.put('/me/password', protect, changePassword);
 router.get('/stats', protect, restrictTo('admin'), getUserStats);
 router.get('/', protect, restrictTo('admin'), getAllUsers);
+router.get('/:id', protect, restrictTo('admin'), getUserById);
 router.put('/:id/role', protect, restrictTo('admin'), updateUserRole);
 
 export default router;
