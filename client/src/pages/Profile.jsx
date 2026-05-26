@@ -1,13 +1,20 @@
 import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Lock, Save, CheckCircle, AlertCircle, ArrowUpCircle, Clock, XCircle, Mail } from 'lucide-react';
+import { User, Lock, Save, CheckCircle, AlertCircle, ArrowUpCircle, Clock, XCircle, Mail, ArrowLeft, Calendar } from 'lucide-react';
 import { useAuth } from '../context/auth';
 import { apiRequest } from '../utils/api';
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
+  const { id } = useParams();
 
-  // Profile state
+  // Admin viewing another user's profile
+  const isViewingOther = id && id !== user?._id;
+  const [viewedUser, setViewedUser] = useState(null);
+  const [viewLoading, setViewLoading] = useState(false);
+
+  // Profile state (own profile editing)
   const [name, setName] = useState(user?.name || '');
   const [profileMsg, setProfileMsg] = useState('');
   const [profileErr, setProfileErr] = useState('');
