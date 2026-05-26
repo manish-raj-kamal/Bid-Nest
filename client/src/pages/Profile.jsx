@@ -173,7 +173,93 @@ const Profile = () => {
       </span>
     );
   };
+  // Admin viewing another user's profile (read-only)
+  if (isViewingOther) {
+    if (viewLoading) {
+      return (
+        <div className="min-h-screen bg-bg-primary pt-24 pb-20 flex items-center justify-center">
+          <div className="animate-pulse flex flex-col items-center">
+            <div className="h-8 w-8 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-text-secondary text-sm font-semibold uppercase tracking-widest">Loading Profile...</p>
+          </div>
+        </div>
+      );
+    }
 
+    if (!viewedUser) {
+      return (
+        <div className="min-h-screen bg-bg-primary pt-24 pb-20 flex flex-col items-center justify-center px-4">
+          <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+          <h2 className="text-xl font-bold text-text-primary mb-2">User Not Found</h2>
+          <Link to="/admin" className="text-sm font-semibold text-accent hover:text-accent-dark transition-colors">
+            ← Back to Admin Dashboard
+          </Link>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-bg-primary pt-24 pb-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <Link to="/admin" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-8 font-medium text-sm">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Admin Dashboard
+          </Link>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-2xl border border-border p-8 shadow-soft"
+          >
+            {/* Avatar + Name */}
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-20 h-20 rounded-2xl bg-accent text-white flex items-center justify-center text-3xl font-bold flex-shrink-0 shadow-soft">
+                {viewedUser.name?.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h1 className="text-2xl font-extrabold text-text-primary tracking-tight">{viewedUser.name}</h1>
+                <p className="text-text-secondary text-sm mt-1">{viewedUser.email}</p>
+                <div className="flex items-center gap-3 mt-2">
+                  {roleBadge(viewedUser.role)}
+                </div>
+              </div>
+            </div>
+
+            {/* Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="p-4 rounded-xl bg-bg-primary border border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <Mail className="w-4 h-4 text-text-secondary" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Email</p>
+                </div>
+                <p className="text-sm font-medium text-text-primary">{viewedUser.email}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-bg-primary border border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <User className="w-4 h-4 text-text-secondary" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Role</p>
+                </div>
+                <p className="text-sm font-medium text-text-primary capitalize">{viewedUser.role}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-bg-primary border border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-4 h-4 text-text-secondary" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Joined</p>
+                </div>
+                <p className="text-sm font-medium text-text-primary">
+                  {new Date(viewedUser.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // Own profile view
   return (
     <div className="min-h-screen bg-bg-primary pt-24 pb-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
