@@ -5,6 +5,7 @@ import {
   createAuction,
   getFeaturedAuctions,
   getCategories,
+  updateAuctionImages,
 } from '../controllers/auctionController.js';
 import protect, { restrictTo } from '../middleware/auth.js';
 
@@ -14,5 +15,6 @@ router.get('/', getAuctions);
 router.get('/featured', getFeaturedAuctions);
 router.get('/:id', getAuction);
 router.post('/', protect, restrictTo('seller', 'admin'), createAuction);
+router.put('/:id/images', protect, restrictTo('seller', 'admin'), updateAuctionImages);
 
 export default router;

@@ -29,15 +29,29 @@ const CreateAuction = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length + imagePreview.length > 5) {
       setError('Maximum 5 images allowed');
       return;
     }
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreview([...imagePreview, ...previews]);
-    setForm({ ...form, images: [...form.images, ...files] });
+
+    const base64Promises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    });
+
+    try {
+      const base64Images = await Promise.all(base64Promises);
+      setImagePreview([...imagePreview, ...base64Images]);
+      setForm({ ...form, images: [...form.images, ...base64Images] });
+    } catch (err) {
+      setError('Failed to process images');
+    }
   };
 
   const removeImage = (index) => {

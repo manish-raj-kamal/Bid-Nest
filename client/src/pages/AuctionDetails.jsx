@@ -6,6 +6,7 @@ import { useAuth } from '../context/auth';
 import { apiRequest } from '../utils/api';
 import CountdownTimer from '../components/ui/CountdownTimer';
 import BidModal from '../components/ui/BidModal';
+import EditImagesModal from '../components/ui/EditImagesModal';
 
 const AuctionDetails = () => {
   const { id } = useParams();
@@ -18,6 +19,7 @@ const AuctionDetails = () => {
   const [error, setError] = useState('');
   
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [isEditImagesOpen, setIsEditImagesOpen] = useState(false);
   const [bidLoading, setBidLoading] = useState(false);
   const [bidError, setBidError] = useState('');
 
@@ -111,6 +113,14 @@ const AuctionDetails = () => {
   const coverImage = auction.image || auction.images?.[0] || '/placeholder-auction.png';
   const isLive = auction.status === 'live';
   const hasBids = auction.bidCount > 0;
+  const isSeller = user && auction.seller?._id === user._id;
+
+  const handleImagesUpdate = (newImages) => {
+    setAuction((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-bg-primary pt-24 pb-20">
@@ -144,6 +154,15 @@ const AuctionDetails = () => {
                   </span>
                   <span className="text-xs font-bold uppercase tracking-wider text-accent">Live Auction</span>
                 </div>
+              )}
+              
+              {isSeller && (
+                <button
+                  onClick={() => setIsEditImagesOpen(true)}
+                  className="absolute bottom-6 right-6 flex items-center gap-2 rounded-xl bg-white/90 backdrop-blur-md px-4 py-2 shadow-soft-lg text-sm font-bold text-text-primary hover:text-accent transition-colors cursor-pointer"
+                >
+                  Edit Images
+                </button>
               )}
             </motion.div>
 
@@ -289,6 +308,14 @@ const AuctionDetails = () => {
         onClose={() => setIsBidModalOpen(false)}
         onLogin={() => navigate('/login')}
         onSubmit={handleSubmitBid}
+      />
+
+      <EditImagesModal
+        auction={auction}
+        open={isEditImagesOpen}
+        onClose={() => setIsEditImagesOpen(false)}
+        user={user}
+        onUpdate={handleImagesUpdate}
       />
     </div>
   );

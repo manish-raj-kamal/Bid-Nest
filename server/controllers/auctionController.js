@@ -93,3 +93,37 @@ export const getCategories = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Update auction images
+// @route   PUT /api/auctions/:id/images
+export const updateAuctionImages = async (req, res) => {
+  try {
+    const { images } = req.body;
+    
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ message: 'Please provide at least one image' });
+    }
+
+    if (images.length > 5) {
+      return res.status(400).json({ message: 'Maximum 5 images allowed' });
+    }
+
+    const auction = await Auction.findById(req.params.id);
+
+    if (!auction) {
+      return res.status(404).json({ message: 'Auction not found' });
+    }
+
+    // Verify user is the seller
+    if (auction.seller.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to update this auction' });
+    }
+
+    auction.images = images;
+    await auction.save();
+
+    res.json(auction);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
