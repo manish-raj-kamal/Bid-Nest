@@ -52,6 +52,12 @@ const seedData = async () => {
     ]);
 
     const now = new Date();
+    
+    // Helper to get a random time between 3 and 5 days from now
+    const getRandomEndTime = () => {
+      const days = Math.random() * (5 - 3) + 3;
+      return new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+    };
 
     // Create demo auctions
     const auctions = await Auction.create([
@@ -64,7 +70,7 @@ const seedData = async () => {
         currentBid: 500,
         bidCount: 0,
         startTime: new Date(now.getTime() - 24 * 60 * 60 * 1000),
-        endTime: new Date(now.getTime() + 3 * 60 * 60 * 1000),
+        endTime: getRandomEndTime(),
         seller: users[0]._id,
         status: 'live',
         featured: true,
@@ -78,7 +84,7 @@ const seedData = async () => {
         currentBid: 200,
         bidCount: 0,
         startTime: new Date(now.getTime() - 12 * 60 * 60 * 1000),
-        endTime: new Date(now.getTime() + 6 * 60 * 60 * 1000),
+        endTime: getRandomEndTime(),
         seller: users[1]._id,
         status: 'live',
         featured: true,
@@ -92,7 +98,7 @@ const seedData = async () => {
         currentBid: 300,
         bidCount: 0,
         startTime: new Date(now.getTime() - 48 * 60 * 60 * 1000),
-        endTime: new Date(now.getTime() + 2 * 60 * 60 * 1000),
+        endTime: getRandomEndTime(),
         seller: users[2]._id,
         status: 'live',
         featured: true,
@@ -106,7 +112,7 @@ const seedData = async () => {
         currentBid: 800,
         bidCount: 0,
         startTime: new Date(now.getTime() - 6 * 60 * 60 * 1000),
-        endTime: new Date(now.getTime() + 8 * 60 * 60 * 1000),
+        endTime: getRandomEndTime(),
         seller: users[0]._id,
         status: 'live',
         featured: true,
@@ -120,7 +126,7 @@ const seedData = async () => {
         currentBid: 100,
         bidCount: 0,
         startTime: new Date(now.getTime() - 2 * 60 * 60 * 1000),
-        endTime: new Date(now.getTime() + 4 * 60 * 60 * 1000),
+        endTime: getRandomEndTime(),
         seller: users[1]._id,
         status: 'live',
         featured: true,
