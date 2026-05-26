@@ -7,93 +7,57 @@ import BidModal from '../components/ui/BidModal';
 import { useAuth } from '../context/auth';
 import { apiRequest } from '../utils/api';
 
-import auctionWatch from '../assets/auction_watch.png';
-import auctionSneakers from '../assets/auction_sneakers.png';
-import auctionCamera from '../assets/auction_camera.png';
-import auctionHandbag from '../assets/auction_handbag.png';
-import heroHeadphones from '../assets/hero_headphones.png';
-
 const now = Date.now();
 
 const allAuctions = [
   {
-    id: 1,
+    id: '65df3e000000000000000001',
     title: 'Swiss Chronograph Watch',
-    image: auctionWatch,
-    currentBid: 1250,
-    bidCount: 34,
+    image: '/auction_watch.png',
+    currentBid: 500,
+    bidCount: 0,
     endTime: new Date(now + 3 * 60 * 60 * 1000).toISOString(),
     category: 'Jewelry',
     isLive: true,
   },
   {
-    id: 2,
+    id: '65df3e000000000000000002',
     title: 'Limited Edition Sneakers',
-    image: auctionSneakers,
-    currentBid: 480,
-    bidCount: 22,
+    image: '/auction_sneakers.png',
+    currentBid: 200,
+    bidCount: 0,
     endTime: new Date(now + 6 * 60 * 60 * 1000).toISOString(),
     category: 'Fashion',
     isLive: true,
   },
   {
-    id: 3,
+    id: '65df3e000000000000000003',
     title: 'Vintage Film Camera',
-    image: auctionCamera,
-    currentBid: 890,
-    bidCount: 18,
+    image: '/auction_camera.png',
+    currentBid: 300,
+    bidCount: 0,
     endTime: new Date(now + 2 * 60 * 60 * 1000).toISOString(),
     category: 'Electronics',
     isLive: true,
   },
   {
-    id: 4,
+    id: '65df3e000000000000000004',
     title: 'Designer Leather Handbag',
-    image: auctionHandbag,
-    currentBid: 1680,
-    bidCount: 41,
+    image: '/auction_handbag.png',
+    currentBid: 800,
+    bidCount: 0,
     endTime: new Date(now + 8 * 60 * 60 * 1000).toISOString(),
     category: 'Fashion',
     isLive: true,
   },
   {
-    id: 5,
+    id: '65df3e000000000000000005',
     title: 'Premium Headphones',
-    image: heroHeadphones,
-    currentBid: 230,
-    bidCount: 15,
+    image: '/hero_headphones.png',
+    currentBid: 100,
+    bidCount: 0,
     endTime: new Date(now + 4 * 60 * 60 * 1000).toISOString(),
     category: 'Electronics',
-    isLive: true,
-  },
-  {
-    id: 6,
-    title: 'Luxury Swiss Watch – Gold Edition',
-    image: auctionWatch,
-    currentBid: 3200,
-    bidCount: 56,
-    endTime: new Date(now + 12 * 60 * 60 * 1000).toISOString(),
-    category: 'Jewelry',
-    isLive: true,
-  },
-  {
-    id: 7,
-    title: 'Collector Vintage Camera',
-    image: auctionCamera,
-    currentBid: 1450,
-    bidCount: 29,
-    endTime: new Date(now + 5 * 60 * 60 * 1000).toISOString(),
-    category: 'Collectibles',
-    isLive: true,
-  },
-  {
-    id: 8,
-    title: 'Limited Leather Tote',
-    image: auctionHandbag,
-    currentBid: 920,
-    bidCount: 17,
-    endTime: new Date(now + 10 * 60 * 60 * 1000).toISOString(),
-    category: 'Fashion',
     isLive: true,
   },
 ];

@@ -23,7 +23,8 @@ const getOtpExpiry = () => {
 // @route   POST /api/users/register
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+    const userRole = (role === 'seller') ? 'seller' : 'bidder';
 
     let user = await User.findOne({ email });
 
@@ -34,6 +35,7 @@ export const registerUser = async (req, res) => {
         // User exists but unverified, update name and password, resend OTP
         user.name = name;
         user.password = password;
+        user.role = userRole;
         user.otp = generateOTP();
         user.otpExpiry = getOtpExpiry();
         await user.save();
@@ -46,7 +48,7 @@ export const registerUser = async (req, res) => {
     const otp = generateOTP();
     const otpExpiry = getOtpExpiry();
 
-    user = await User.create({ name, email, password, otp, otpExpiry, isVerified: false });
+    user = await User.create({ name, email, password, otp, otpExpiry, isVerified: false, role: userRole });
     
     await sendOtpEmail(user.email, user.otp, 'registration');
 
@@ -255,4 +257,21 @@ export const resetPassword = async (req, res) => {
 // @route   GET /api/users/me
 export const getMe = async (req, res) => {
   res.json(req.user);
+};
+
+// @desc    Get platform stats for admin
+// @route   GET /api/users/stats
+export const getUserStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const { default: Auction } = await import('../models/Auction.js');
+    const totalAuctions = await Auction.countDocuments();
+    
+    res.json({
+      totalUsers,
+      totalAuctions
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

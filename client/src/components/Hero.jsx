@@ -4,7 +4,6 @@ import { ArrowRight, Clock, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import Button from './ui/Button';
 import LiveBadge from './ui/LiveBadge';
 import CountdownTimer from './ui/CountdownTimer';
-import heroImage from '../assets/hero_headphones.png';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -134,7 +133,7 @@ const Hero = () => {
             >
               <div className="absolute inset-x-6 top-5 h-10 rounded-full bg-white/80 blur-xl" />
               <motion.img
-                src={heroImage}
+                src="/hero_headphones.png"
                 alt="Premium Headphones"
                 className="w-full max-w-sm lg:max-w-md object-contain relative z-10 drop-shadow-[0_35px_35px_rgba(17,24,39,0.18)]"
                 animate={{ y: [0, -12, 0] }}

@@ -17,34 +17,48 @@ const Login = () => {
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (!clientId || !window.google) return;
+    if (!clientId) return;
 
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: async (response) => {
-        try {
-          setLoading(true);
-          setError('');
-          await googleLogin(response.credential);
-          navigate('/');
-        } catch (err) {
-          setError(err.message || 'Google login failed');
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-
-    if (googleBtnRef.current) {
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        type: 'standard',
-        theme: 'outline',
-        size: 'large',
-        width: googleBtnRef.current.offsetWidth || 400,
-        text: 'signin_with',
+    const initGoogle = () => {
+      if (!window.google) return;
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          try {
+            setLoading(true);
+            setError('');
+            await googleLogin(response.credential);
+            navigate('/');
+          } catch (err) {
+            setError(err.message || 'Google login failed');
+          } finally {
+            setLoading(false);
+          }
+        },
       });
+
+      if (googleBtnRef.current) {
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          width: googleBtnRef.current.offsetWidth || 400,
+          text: 'signin_with',
+        });
+      }
+    };
+
+    if (window.google) {
+      initGoogle();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGoogle;
+      document.head.appendChild(script);
     }
-  }, []);
+  }, [googleLogin, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -181,6 +195,33 @@ const Login = () => {
             Create account
           </Link>
         </p>
+
+        {/* Quick Test Accounts */}
+        <div className="mt-8 border-t border-border pt-6">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-text-secondary text-center mb-4">
+            Quick Login — Test Accounts
+          </p>
+          <div className="grid gap-2">
+            {[
+              { label: 'Seller', email: 'john@bidnest.com', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+              { label: 'Bidder', email: 'sarah@bidnest.com', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+              { label: 'Admin', email: 'admin@bidnest.com', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+            ].map((acc) => (
+              <button
+                key={acc.email}
+                type="button"
+                onClick={() => { setEmail(acc.email); setPassword('password123'); }}
+                className={`flex items-center justify-between w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all hover:shadow-soft cursor-pointer ${acc.color}`}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">{acc.label}</span>
+                  <span className="font-mono text-xs opacity-80">{acc.email}</span>
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 opacity-50" />
+              </button>
+            ))}
+          </div>
+        </div>
       </motion.div>
     </div>
   );

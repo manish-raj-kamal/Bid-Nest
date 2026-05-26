@@ -13,6 +13,7 @@ const seedData = async () => {
     // Clear existing data
     await User.deleteMany();
     await Auction.deleteMany();
+    await mongoose.connection.db.collection('bids').deleteMany({});
 
     // Create demo users
     const users = await User.create([
@@ -21,18 +22,32 @@ const seedData = async () => {
         email: 'john@bidnest.com',
         password: 'password123',
         avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=John',
+        role: 'seller',
+        isVerified: true,
       },
       {
         name: 'Sarah Bidder',
         email: 'sarah@bidnest.com',
         password: 'password123',
         avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Sarah',
+        role: 'bidder',
+        isVerified: true,
       },
       {
         name: 'Mike Collector',
         email: 'mike@bidnest.com',
         password: 'password123',
         avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Mike',
+        role: 'bidder',
+        isVerified: true,
+      },
+      {
+        name: 'Admin User',
+        email: 'admin@bidnest.com',
+        password: 'password123',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Admin',
+        role: 'admin',
+        isVerified: true,
       },
     ]);
 
@@ -46,8 +61,8 @@ const seedData = async () => {
         images: ['/auction_watch.png'],
         category: 'Jewelry',
         startingBid: 500,
-        currentBid: 1250,
-        bidCount: 34,
+        currentBid: 500,
+        bidCount: 0,
         startTime: new Date(now.getTime() - 24 * 60 * 60 * 1000),
         endTime: new Date(now.getTime() + 3 * 60 * 60 * 1000),
         seller: users[0]._id,
@@ -60,8 +75,8 @@ const seedData = async () => {
         images: ['/auction_sneakers.png'],
         category: 'Fashion',
         startingBid: 200,
-        currentBid: 480,
-        bidCount: 22,
+        currentBid: 200,
+        bidCount: 0,
         startTime: new Date(now.getTime() - 12 * 60 * 60 * 1000),
         endTime: new Date(now.getTime() + 6 * 60 * 60 * 1000),
         seller: users[1]._id,
@@ -74,8 +89,8 @@ const seedData = async () => {
         images: ['/auction_camera.png'],
         category: 'Electronics',
         startingBid: 300,
-        currentBid: 890,
-        bidCount: 18,
+        currentBid: 300,
+        bidCount: 0,
         startTime: new Date(now.getTime() - 48 * 60 * 60 * 1000),
         endTime: new Date(now.getTime() + 2 * 60 * 60 * 1000),
         seller: users[2]._id,
@@ -88,8 +103,8 @@ const seedData = async () => {
         images: ['/auction_handbag.png'],
         category: 'Fashion',
         startingBid: 800,
-        currentBid: 1680,
-        bidCount: 41,
+        currentBid: 800,
+        bidCount: 0,
         startTime: new Date(now.getTime() - 6 * 60 * 60 * 1000),
         endTime: new Date(now.getTime() + 8 * 60 * 60 * 1000),
         seller: users[0]._id,
@@ -102,8 +117,8 @@ const seedData = async () => {
         images: ['/hero_headphones.png'],
         category: 'Electronics',
         startingBid: 100,
-        currentBid: 230,
-        bidCount: 15,
+        currentBid: 100,
+        bidCount: 0,
         startTime: new Date(now.getTime() - 2 * 60 * 60 * 1000),
         endTime: new Date(now.getTime() + 4 * 60 * 60 * 1000),
         seller: users[1]._id,

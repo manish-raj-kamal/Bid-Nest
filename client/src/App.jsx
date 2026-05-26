@@ -8,6 +8,9 @@ import Signup from './pages/Signup';
 import Auctions from './pages/Auctions';
 import CreateAuction from './pages/CreateAuction';
 import ForgotPassword from './pages/ForgotPassword';
+import AuctionDetails from './pages/AuctionDetails';
+import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
 /* Scroll to top on route change */
@@ -34,7 +37,25 @@ const AppLayout = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/auctions" element={<Auctions />} />
-          <Route path="/create-auction" element={<CreateAuction />} />
+          <Route path="/auctions/:id" element={<AuctionDetails />} />
+          
+          <Route 
+            path="/create-auction" 
+            element={
+              <ProtectedRoute allowedRoles={['seller', 'admin']}>
+                <CreateAuction />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

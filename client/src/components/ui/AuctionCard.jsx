@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock, Gavel } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import CountdownTimer from './CountdownTimer';
 
 const AuctionCard = ({ auction, index = 0, onPlaceBid }) => {
@@ -24,39 +25,47 @@ const AuctionCard = ({ auction, index = 0, onPlaceBid }) => {
       whileHover={{ y: -8 }}
       className="group overflow-hidden rounded-lg border border-border bg-white shadow-soft transition-all duration-300 hover:border-accent/25 hover:shadow-soft-lg"
     >
-      {/* Image Container */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-bg-primary">
-        <img
-          src={coverImage}
-          alt={title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-        />
-        {/* Live Badge */}
-        {isLive && (
-          <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/92 px-3 py-1.5 shadow-soft backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-accent">Live</span>
-          </div>
-        )}
-        {/* Category Tag */}
-        {category && (
-          <div className="absolute right-4 top-4 rounded-full bg-white/92 px-3 py-1.5 shadow-soft backdrop-blur-sm">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-text-secondary">{category}</span>
-          </div>
-        )}
-      </div>
+      {/* Clickable Area */}
+      <Link to={`/auctions/${auction._id || auction.id}`} className="block">
+        {/* Image Container */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-bg-primary">
+          <img
+            src={coverImage}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          />
+          {/* Live Badge */}
+          {isLive && (
+            <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/92 px-3 py-1.5 shadow-soft backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-accent">Live</span>
+            </div>
+          )}
+          {/* Category Tag */}
+          {category && (
+            <div className="absolute right-4 top-4 rounded-full bg-white/92 px-3 py-1.5 shadow-soft backdrop-blur-sm">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-text-secondary">{category}</span>
+            </div>
+          )}
+        </div>
 
-      {/* Content */}
-      <div className="p-5 sm:p-6">
-        <h3 className="mb-4 min-h-6 truncate text-base font-semibold text-text-primary transition-colors duration-300 group-hover:text-accent">
-          {title}
-        </h3>
+        {/* Content Top */}
+        <div className="p-5 sm:p-6 pb-0">
+          <h3 className="mb-4 min-h-6 truncate text-base font-semibold text-text-primary transition-colors duration-300 group-hover:text-accent">
+            {title}
+          </h3>
+        </div>
+      </Link>
+
+      <div className="p-5 sm:p-6 pt-0">
         <div className="grid grid-cols-[1fr_auto] items-end gap-4">
           <div>
-            <p className="mb-1 text-[11px] uppercase tracking-[0.16em] text-text-secondary">Current Bid</p>
+            <p className="mb-1 text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+              {!bidCount || bidCount === 0 ? 'Base Price' : 'Current Bid'}
+            </p>
             <p className="text-2xl font-bold text-text-primary">${Number(currentBid || 0).toLocaleString()}</p>
           </div>
           <div className="text-right">

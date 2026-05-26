@@ -29,11 +29,11 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, role) => {
     const data = await apiRequest('/api/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
     // Do NOT set user or localStorage yet, as they need to verify OTP
     return data;

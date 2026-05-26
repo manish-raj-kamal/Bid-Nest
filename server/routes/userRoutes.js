@@ -7,9 +7,10 @@ import {
   resendOtp, 
   googleLogin, 
   forgotPassword, 
-  resetPassword 
+  resetPassword,
+  getUserStats
 } from '../controllers/userController.js';
-import protect from '../middleware/auth.js';
+import protect, { restrictTo } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.post('/google', googleLogin);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.get('/me', protect, getMe);
+router.get('/stats', protect, restrictTo('admin'), getUserStats);
 
 export default router;

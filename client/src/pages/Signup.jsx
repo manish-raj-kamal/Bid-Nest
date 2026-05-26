@@ -10,6 +10,7 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('bidder');
   const [otp, setOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -22,34 +23,48 @@ const Signup = () => {
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (!clientId || !window.google) return;
+    if (!clientId) return;
 
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: async (response) => {
-        try {
-          setLoading(true);
-          setError('');
-          await googleLogin(response.credential);
-          navigate('/');
-        } catch (err) {
-          setError(err.message || 'Google signup failed');
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-
-    if (googleBtnRef.current) {
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        type: 'standard',
-        theme: 'outline',
-        size: 'large',
-        width: googleBtnRef.current.offsetWidth || 400,
-        text: 'signup_with',
+    const initGoogle = () => {
+      if (!window.google) return;
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          try {
+            setLoading(true);
+            setError('');
+            await googleLogin(response.credential);
+            navigate('/');
+          } catch (err) {
+            setError(err.message || 'Google signup failed');
+          } finally {
+            setLoading(false);
+          }
+        },
       });
+
+      if (googleBtnRef.current) {
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          width: googleBtnRef.current.offsetWidth || 400,
+          text: 'signup_with',
+        });
+      }
+    };
+
+    if (window.google) {
+      initGoogle();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGoogle;
+      document.head.appendChild(script);
     }
-  }, []);
+  }, [googleLogin, navigate]);
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
@@ -67,7 +82,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, role);
       setSuccess('OTP sent to your email. Please verify.');
       setStep('otp');
     } catch (err) {
@@ -166,6 +181,36 @@ const Signup = () => {
           {step === 'register' ? (
             <>
               <form onSubmit={handleRegisterSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
+                    I want to
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setRole('bidder')}
+                      className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                        role === 'bidder' 
+                          ? 'bg-accent/10 border-accent text-accent' 
+                          : 'bg-white border-border text-text-secondary hover:border-accent/40'
+                      }`}
+                    >
+                      Bid on Items
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole('seller')}
+                      className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                        role === 'seller' 
+                          ? 'bg-accent/10 border-accent text-accent' 
+                          : 'bg-white border-border text-text-secondary hover:border-accent/40'
+                      }`}
+                    >
+                      Sell Items
+                    </button>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
                     Full Name

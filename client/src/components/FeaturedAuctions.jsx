@@ -1,84 +1,77 @@
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import AuctionCard from './ui/AuctionCard';
 import BidModal from './ui/BidModal';
 import { useAuth } from '../context/auth';
-
-import auctionWatch from '../assets/auction_watch.png';
-import auctionSneakers from '../assets/auction_sneakers.png';
-import auctionCamera from '../assets/auction_camera.png';
-import auctionHandbag from '../assets/auction_handbag.png';
-
-const now = Date.now();
-
-const auctions = [
-  {
-    id: 1,
-    title: 'Swiss Chronograph Watch',
-    image: auctionWatch,
-    currentBid: 1250,
-    bidCount: 34,
-    endTime: new Date(now + 3 * 60 * 60 * 1000).toISOString(),
-    category: 'Jewelry',
-    isLive: true,
-  },
-  {
-    id: 2,
-    title: 'Limited Edition Sneakers',
-    image: auctionSneakers,
-    currentBid: 480,
-    bidCount: 22,
-    endTime: new Date(now + 6 * 60 * 60 * 1000).toISOString(),
-    category: 'Fashion',
-    isLive: true,
-  },
-  {
-    id: 3,
-    title: 'Vintage Film Camera',
-    image: auctionCamera,
-    currentBid: 890,
-    bidCount: 18,
-    endTime: new Date(now + 2 * 60 * 60 * 1000).toISOString(),
-    category: 'Electronics',
-    isLive: true,
-  },
-  {
-    id: 4,
-    title: 'Designer Leather Handbag',
-    image: auctionHandbag,
-    currentBid: 1680,
-    bidCount: 41,
-    endTime: new Date(now + 8 * 60 * 60 * 1000).toISOString(),
-    category: 'Fashion',
-    isLive: true,
-  },
-];
+import { apiRequest } from '../utils/api';
 
 const FeaturedAuctions = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [items, setItems] = useState(auctions);
+  const [items, setItems] = useState([]);
   const [selectedAuction, setSelectedAuction] = useState(null);
   const [bidError, setBidError] = useState('');
+  const [bidLoading, setBidLoading] = useState(false);
 
-  const handleSubmitBid = (amount) => {
+  useEffect(() => {
+    let ignore = false;
+    const fetchFeatured = async () => {
+      try {
+        const data = await apiRequest('/api/auctions/featured');
+        if (!ignore && data) {
+          setItems(data);
+        }
+      } catch (err) {
+        console.error("Failed to load featured auctions:", err);
+      }
+    };
+    fetchFeatured();
+    return () => { ignore = true; };
+  }, []);
+
+  const handleSubmitBid = async (amount) => {
     if (!selectedAuction) return;
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
 
     if (!Number.isFinite(amount) || amount <= Number(selectedAuction.currentBid || 0)) {
       setBidError(`Bid must be higher than $${Number(selectedAuction.currentBid || 0).toLocaleString()}.`);
       return;
     }
 
-    setItems((current) =>
-      current.map((auction) =>
-        auction.id === selectedAuction.id
-          ? { ...auction, currentBid: amount, bidCount: auction.bidCount + 1 }
-          : auction
-      )
-    );
-    setSelectedAuction(null);
+    setBidLoading(true);
+    setBidError('');
+
+    try {
+      if (selectedAuction._id) {
+        await apiRequest('/api/bids', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify({ auctionId: selectedAuction._id, amount }),
+        });
+      }
+
+      setItems((current) =>
+        current.map((auction) =>
+          (auction._id || auction.id) === (selectedAuction._id || selectedAuction.id)
+            ? { ...auction, currentBid: amount, bidCount: Number(auction.bidCount || 0) + 1 }
+            : auction
+        )
+      );
+      setSelectedAuction(null);
+    } catch (error) {
+      setBidError(error.message);
+    } finally {
+      setBidLoading(false);
+    }
   };
 
   const openBid = (auction) => {
@@ -124,7 +117,7 @@ const FeaturedAuctions = () => {
         {/* Auction Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {items.map((auction, index) => (
-            <AuctionCard key={auction.id} auction={auction} index={index} onPlaceBid={openBid} />
+            <AuctionCard key={auction._id || auction.id} auction={auction} index={index} onPlaceBid={openBid} />
           ))}
         </div>
 
@@ -142,6 +135,7 @@ const FeaturedAuctions = () => {
         auction={selectedAuction}
         open={Boolean(selectedAuction)}
         error={bidError}
+        loading={bidLoading}
         user={user}
         onClose={() => setSelectedAuction(null)}
         onLogin={() => navigate('/login')}

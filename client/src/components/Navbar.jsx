@@ -100,9 +100,16 @@ const Navbar = () => {
 
               {user ? (
                 <>
-                  <Button variant="secondary" size="sm" onClick={() => navigate('/create-auction')}>
-                    <Plus className="w-4 h-4" /> Create
-                  </Button>
+                  {(user?.role === 'seller' || user?.role === 'admin') && (
+                    <Button variant="secondary" size="sm" onClick={() => navigate('/create-auction')}>
+                      <Plus className="w-4 h-4" /> Create
+                    </Button>
+                  )}
+                  {user?.role === 'admin' && (
+                    <Button variant="secondary" size="sm" onClick={() => navigate('/admin')}>
+                      Admin
+                    </Button>
+                  )}
                   <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-3 py-1.5">
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
                       {user.name?.charAt(0).toUpperCase()}
@@ -163,12 +170,23 @@ const Navbar = () => {
                   {link.name}
                 </button>
               ))}
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-bg-secondary hover:text-accent"
+                >
+                  Admin
+                </Link>
+              )}
               <div className="flex gap-3 mt-4 pt-4 border-t border-border">
                 {user ? (
                   <>
-                    <Button variant="secondary" size="sm" className="flex-1" onClick={() => { setMobileOpen(false); navigate('/create-auction'); }}>
-                      Create Auction
-                    </Button>
+                    {(user?.role === 'seller' || user?.role === 'admin') && (
+                      <Button variant="secondary" size="sm" className="flex-1" onClick={() => { setMobileOpen(false); navigate('/create-auction'); }}>
+                        Create Auction
+                      </Button>
+                    )}
                     <Button variant="ghost" size="sm" className="flex-1" onClick={() => { logout(); setMobileOpen(false); navigate('/'); }}>
                       Log Out
                     </Button>
