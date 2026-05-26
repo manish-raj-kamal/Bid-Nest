@@ -88,13 +88,18 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const updateUser = (data) => {
+    setUser(data);
+    localStorage.setItem('bidnest_user', JSON.stringify(data));
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('bidnest_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, verifyOtp, resendOtp, googleLogin, forgotPassword, resetPassword, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, verifyOtp, resendOtp, googleLogin, forgotPassword, resetPassword, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -110,12 +110,12 @@ const Navbar = () => {
                       Admin
                     </Button>
                   )}
-                  <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-3 py-1.5">
+                  <Link to="/profile" className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-3 py-1.5 hover:border-accent/30 transition-colors">
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
                       {user.name?.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-xs font-medium text-text-primary max-w-[80px] truncate">{user.name}</span>
-                  </div>
+                  </Link>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

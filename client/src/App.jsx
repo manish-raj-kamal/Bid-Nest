@@ -10,6 +10,7 @@ import CreateAuction from './pages/CreateAuction';
 import ForgotPassword from './pages/ForgotPassword';
 import AuctionDetails from './pages/AuctionDetails';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
@@ -53,6 +54,15 @@ const AppLayout = () => {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } 
           />

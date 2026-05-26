@@ -5,8 +5,6 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/auth';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,6 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const googleBtnRef = useRef(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -64,6 +63,11 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+
     try {
       await login(email, password);
       navigate('/');
@@ -71,6 +75,14 @@ const Login = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Quick fill for test accounts
+  const fillTestAccount = (email) => {
+    if (formRef.current) {
+      formRef.current.email.value = email;
+      formRef.current.password.value = 'password123';
     }
   };
 
@@ -113,17 +125,18 @@ const Login = () => {
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form ref={formRef} onSubmit={handleSubmit} id="login-form" action="/login" method="POST" className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
+              <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
                 Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                 <input
+                  id="login-email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  autoComplete="email"
                   placeholder="you@example.com"
                   required
                   className="w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-bg-primary text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-accent/40 focus:ring-2 focus:ring-accent/10 transition-all duration-300"
@@ -132,15 +145,16 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
+              <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   required
                   className="w-full pl-12 pr-12 py-3 rounded-xl border border-border bg-bg-primary text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-accent/40 focus:ring-2 focus:ring-accent/10 transition-all duration-300"
@@ -155,11 +169,7 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20 accent-accent" />
-                <span className="text-xs text-text-secondary">Remember me</span>
-              </label>
+            <div className="flex items-center justify-end">
               <Link
                 to="/forgot-password"
                 className="text-xs font-semibold text-accent transition-colors hover:text-accent-dark"
@@ -196,7 +206,7 @@ const Login = () => {
           </Link>
         </p>
 
-        {/* Quick Test Accounts */}
+        {/* Quick Test Accounts (Seller + Bidder only) */}
         <div className="mt-8 border-t border-border pt-6">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-text-secondary text-center mb-4">
             Quick Login — Test Accounts
@@ -205,12 +215,11 @@ const Login = () => {
             {[
               { label: 'Seller', email: 'john@bidnest.com', color: 'bg-blue-50 border-blue-200 text-blue-700' },
               { label: 'Bidder', email: 'sarah@bidnest.com', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-              { label: 'Admin', email: 'admin@bidnest.com', color: 'bg-amber-50 border-amber-200 text-amber-700' },
             ].map((acc) => (
               <button
                 key={acc.email}
                 type="button"
-                onClick={() => { setEmail(acc.email); setPassword('password123'); }}
+                onClick={() => fillTestAccount(acc.email)}
                 className={`flex items-center justify-between w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all hover:shadow-soft cursor-pointer ${acc.color}`}
               >
                 <span className="flex items-center gap-2">
