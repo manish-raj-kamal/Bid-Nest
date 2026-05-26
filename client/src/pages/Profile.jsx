@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Lock, Save, CheckCircle, AlertCircle, ArrowUpCircle, Clock, XCircle, Mail, ArrowLeft, Calendar } from 'lucide-react';
+import { User, Lock, Save, CheckCircle, AlertCircle, ArrowUpCircle, Clock, XCircle, Mail, ArrowLeft, Calendar, Gavel, Package, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/auth';
 import { apiRequest } from '../utils/api';
 
@@ -35,6 +35,14 @@ const Profile = () => {
   const [upgradeErr, setUpgradeErr] = useState('');
   const [upgradeLoading, setUpgradeLoading] = useState(false);
 
+  // My Bids state
+  const [myBids, setMyBids] = useState([]);
+  const [loadingBids, setLoadingBids] = useState(false);
+
+  // My Auctions state
+  const [myAuctions, setMyAuctions] = useState([]);
+  const [loadingAuctions, setLoadingAuctions] = useState(false);
+
   useEffect(() => {
     if (isViewingOther && user?.role === 'admin') {
       setViewLoading(true);
@@ -54,6 +62,30 @@ const Profile = () => {
       })
         .then((data) => setExistingRequest(data))
         .catch(() => {});
+    }
+  }, [user, isViewingOther]);
+
+  useEffect(() => {
+    if (!isViewingOther && user?.role === 'bidder') {
+      setLoadingBids(true);
+      apiRequest('/api/bids/me', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+        .then((data) => setMyBids(data))
+        .catch(() => {})
+        .finally(() => setLoadingBids(false));
+    }
+  }, [user, isViewingOther]);
+
+  useEffect(() => {
+    if (!isViewingOther && user?.role === 'seller') {
+      setLoadingAuctions(true);
+      apiRequest('/api/auctions/me', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+        .then((data) => setMyAuctions(data))
+        .catch(() => {})
+        .finally(() => setLoadingAuctions(false));
     }
   }, [user, isViewingOther]);
 
@@ -535,6 +567,142 @@ const Profile = () => {
                     </div>
                   </form>
                 </>
+              )}
+            </motion.div>
+          )}
+
+          {/* My Bids Card (bidder only) */}
+          {!isViewingOther && user?.role === 'bidder' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-soft"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <Gavel className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-bold text-text-primary">My Bids</h2>
+              </div>
+              
+              {loadingBids ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : myBids.length > 0 ? (
+                <div className="space-y-4">
+                  {myBids.map((bid) => (
+                    <div key={bid._id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-border bg-bg-primary gap-4">
+                      <div className="flex items-center gap-4">
+                        {bid.auction?.images?.[0] ? (
+                          <img src={bid.auction.images[0]} alt={bid.auction.title} className="w-16 h-16 rounded-lg object-cover" />
+                        ) : (
+                          <div className="w-16 h-16 rounded-lg bg-gray-200 flex flex-shrink-0" />
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-text-primary text-sm">{bid.auction?.title || 'Unknown Auction'}</h3>
+                          <p className="text-xs text-text-secondary mt-1">
+                            Placed on: {new Date(bid.createdAt).toLocaleDateString()}
+                          </p>
+                          <span className={`inline-flex px-2 py-0.5 mt-2 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            bid.auction?.status === 'live' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {bid.auction?.status || 'Ended'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
+                        <div className="text-right">
+                          <p className="text-xs text-text-secondary">Your Bid</p>
+                          <p className="font-bold text-lg text-accent">${bid.amount}</p>
+                        </div>
+                        {bid.auction?._id && (
+                          <Link to={`/auctions/${bid.auction._id}`} className="p-2 rounded-lg bg-bg-secondary hover:bg-border text-text-secondary hover:text-text-primary transition-colors">
+                            <ExternalLink className="w-4 h-4" />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-2 border-dashed border-border rounded-xl">
+                  <p className="text-sm text-text-secondary">You haven't placed any bids yet.</p>
+                  <Link to="/auctions" className="inline-block mt-3 text-sm font-semibold text-accent hover:text-accent-dark">
+                    Explore Auctions →
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* My Auctions Card (seller only) */}
+          {!isViewingOther && user?.role === 'seller' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-soft"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <Package className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-lg font-bold text-text-primary">My Listings</h2>
+                </div>
+                <Link to="/auctions/create" className="px-4 py-2 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-dark transition-colors">
+                  + Create New
+                </Link>
+              </div>
+              
+              {loadingAuctions ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : myAuctions.length > 0 ? (
+                <div className="space-y-4">
+                  {myAuctions.map((auction) => (
+                    <div key={auction._id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-border bg-bg-primary gap-4">
+                      <div className="flex items-center gap-4">
+                        {auction.images?.[0] ? (
+                          <img src={auction.images[0]} alt={auction.title} className="w-16 h-16 rounded-lg object-cover" />
+                        ) : (
+                          <div className="w-16 h-16 rounded-lg bg-gray-200 flex flex-shrink-0" />
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-text-primary text-sm">{auction.title}</h3>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-text-secondary">
+                            <span>Bids: {auction.bidCount}</span>
+                            <span>•</span>
+                            <span>Ends: {new Date(auction.endTime).toLocaleDateString()}</span>
+                          </div>
+                          <span className={`inline-flex px-2 py-0.5 mt-2 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            auction.status === 'live' ? 'bg-emerald-50 text-emerald-700' :
+                            auction.status === 'upcoming' ? 'bg-blue-50 text-blue-700' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {auction.status}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
+                        <div className="text-right">
+                          <p className="text-xs text-text-secondary">Current Bid</p>
+                          <p className="font-bold text-lg text-accent">${auction.currentBid}</p>
+                        </div>
+                        <Link to={`/auctions/${auction._id}`} className="p-2 rounded-lg bg-bg-secondary hover:bg-border text-text-secondary hover:text-text-primary transition-colors">
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-2 border-dashed border-border rounded-xl">
+                  <p className="text-sm text-text-secondary">You haven't created any auctions yet.</p>
+                </div>
               )}
             </motion.div>
           )}
