@@ -63,3 +63,17 @@ export const getAuctionBids = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get logged in user's bids
+// @route   GET /api/bids/me
+export const getUserBids = async (req, res) => {
+  try {
+    const bids = await Bid.find({ bidder: req.user._id })
+      .populate('auction', 'title images currentBid status endTime')
+      .sort({ createdAt: -1 });
+
+    res.json(bids);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

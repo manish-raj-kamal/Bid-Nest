@@ -127,3 +127,16 @@ export const updateAuctionImages = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get logged in user's auctions
+// @route   GET /api/auctions/me
+export const getMyAuctions = async (req, res) => {
+  try {
+    const auctions = await Auction.find({ seller: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json(auctions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
