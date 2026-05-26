@@ -275,3 +275,110 @@ export const getUserStats = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Update profile (name, avatar)
+// @route   PUT /api/users/me
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, avatar } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (name) user.name = name;
+    if (avatar !== undefined) user.avatar = avatar;
+    await user.save();
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      role: user.role,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Change password
+// @route   PUT /api/users/me/password
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Google-only users don't have a password
+    if (!user.password) {
+      return res.status(400).json({ message: 'Your account uses Google Sign-In. Please set a password via Forgot Password.' });
+    }
+
+    if (!(await user.comparePassword(currentPassword))) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get all users (admin)
+// @route   GET /api/users
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ isVerified: true })
+      .select('name email avatar role createdAt')
+      .sort({ createdAt: -1 });
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update user role (admin)
+// @route   PUT /api/users/:id/role
+export const updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    if (!['bidder', 'seller'].includes(role)) {
+      return res.status(400).json({ message: 'Role must be bidder or seller' });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Cannot change admin role' });
+    }
+
+    if (user._id.toString() === req.user._id.toString()) {
+      return res.status(403).json({ message: 'Cannot change your own role' });
+    }
+
+    user.role = role;
+    await user.save();
+
+    res.json({ _id: user._id, name: user.name, email: user.email, role: user.role });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

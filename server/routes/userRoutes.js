@@ -8,7 +8,11 @@ import {
   googleLogin, 
   forgotPassword, 
   resetPassword,
-  getUserStats
+  getUserStats,
+  updateProfile,
+  changePassword,
+  getAllUsers,
+  updateUserRole,
 } from '../controllers/userController.js';
 import protect, { restrictTo } from '../middleware/auth.js';
 
@@ -22,6 +26,10 @@ router.post('/google', googleLogin);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.get('/me', protect, getMe);
+router.put('/me', protect, updateProfile);
+router.put('/me/password', protect, changePassword);
 router.get('/stats', protect, restrictTo('admin'), getUserStats);
+router.get('/', protect, restrictTo('admin'), getAllUsers);
+router.put('/:id/role', protect, restrictTo('admin'), updateUserRole);
 
 export default router;

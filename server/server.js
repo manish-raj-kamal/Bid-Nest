@@ -5,6 +5,7 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import auctionRoutes from './routes/auctionRoutes.js';
 import bidRoutes from './routes/bidRoutes.js';
+import upgradeRoutes from './routes/upgradeRoutes.js';
 import { getCategories } from './controllers/auctionController.js';
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids', bidRoutes);
+app.use('/api/upgrade-requests', upgradeRoutes);
 app.get('/api/categories', getCategories);
 
 // Health check
